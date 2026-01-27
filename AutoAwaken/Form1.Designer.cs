@@ -61,21 +61,31 @@ namespace AutoAwaken
             toolStripComboBox1 = new ToolStripComboBox();
             numericUpDown1 = new NumericUpDown();
             label1 = new Label();
-            label2 = new Label();
-            label3 = new Label();
-            label4 = new Label();
             txtTime = new TextBox();
             label5 = new Label();
             comboMode = new ComboBox();
             label6 = new Label();
             checkBox1 = new CheckBox();
+            chkPerin = new CheckBox();
+            txtPerin = new TextBox();
+            label7 = new Label();
+            groupBox1 = new GroupBox();
+            groupBox2 = new GroupBox();
+            groupBox3 = new GroupBox();
+            groupBox4 = new GroupBox();
+            groupBox5 = new GroupBox();
             toolStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)numericUpDown1).BeginInit();
+            groupBox1.SuspendLayout();
+            groupBox2.SuspendLayout();
+            groupBox3.SuspendLayout();
+            groupBox4.SuspendLayout();
+            groupBox5.SuspendLayout();
             SuspendLayout();
             // 
             // txtX
             // 
-            txtX.Location = new Point(300, 82);
+            txtX.Location = new Point(220, 21);
             txtX.Name = "txtX";
             txtX.Size = new Size(100, 23);
             txtX.TabIndex = 0;
@@ -83,7 +93,7 @@ namespace AutoAwaken
             // 
             // txtY
             // 
-            txtY.Location = new Point(406, 82);
+            txtY.Location = new Point(326, 21);
             txtY.Name = "txtY";
             txtY.Size = new Size(100, 23);
             txtY.TabIndex = 1;
@@ -91,7 +101,7 @@ namespace AutoAwaken
             // 
             // txtAreaY
             // 
-            txtAreaY.Location = new Point(301, 111);
+            txtAreaY.Location = new Point(245, 26);
             txtAreaY.Name = "txtAreaY";
             txtAreaY.Size = new Size(100, 23);
             txtAreaY.TabIndex = 3;
@@ -100,7 +110,7 @@ namespace AutoAwaken
             // 
             // txtAreaX
             // 
-            txtAreaX.Location = new Point(195, 112);
+            txtAreaX.Location = new Point(139, 27);
             txtAreaX.Name = "txtAreaX";
             txtAreaX.Size = new Size(100, 23);
             txtAreaX.TabIndex = 2;
@@ -108,7 +118,7 @@ namespace AutoAwaken
             // 
             // txtAreaH
             // 
-            txtAreaH.Location = new Point(513, 111);
+            txtAreaH.Location = new Point(457, 26);
             txtAreaH.Name = "txtAreaH";
             txtAreaH.Size = new Size(100, 23);
             txtAreaH.TabIndex = 5;
@@ -116,7 +126,7 @@ namespace AutoAwaken
             // 
             // txtAreaW
             // 
-            txtAreaW.Location = new Point(407, 111);
+            txtAreaW.Location = new Point(351, 26);
             txtAreaW.Name = "txtAreaW";
             txtAreaW.Size = new Size(100, 23);
             txtAreaW.TabIndex = 4;
@@ -124,16 +134,16 @@ namespace AutoAwaken
             // 
             // txtLog
             // 
-            txtLog.Location = new Point(49, 325);
+            txtLog.Location = new Point(49, 455);
             txtLog.Multiline = true;
             txtLog.Name = "txtLog";
             txtLog.ScrollBars = ScrollBars.Vertical;
-            txtLog.Size = new Size(557, 409);
+            txtLog.Size = new Size(557, 313);
             txtLog.TabIndex = 6;
             // 
             // btnStart
             // 
-            btnStart.Location = new Point(440, 285);
+            btnStart.Location = new Point(433, 425);
             btnStart.Name = "btnStart";
             btnStart.Size = new Size(75, 23);
             btnStart.TabIndex = 8;
@@ -143,7 +153,7 @@ namespace AutoAwaken
             // 
             // btnStop
             // 
-            btnStop.Location = new Point(537, 285);
+            btnStop.Location = new Point(514, 425);
             btnStop.Name = "btnStop";
             btnStop.Size = new Size(75, 23);
             btnStop.TabIndex = 10;
@@ -153,7 +163,7 @@ namespace AutoAwaken
             // 
             // btnSelectArea
             // 
-            btnSelectArea.Location = new Point(114, 112);
+            btnSelectArea.Location = new Point(58, 27);
             btnSelectArea.Name = "btnSelectArea";
             btnSelectArea.Size = new Size(75, 23);
             btnSelectArea.TabIndex = 11;
@@ -163,7 +173,7 @@ namespace AutoAwaken
             // 
             // btnTrackCoords
             // 
-            btnTrackCoords.Location = new Point(121, 81);
+            btnTrackCoords.Location = new Point(41, 20);
             btnTrackCoords.Name = "btnTrackCoords";
             btnTrackCoords.Size = new Size(75, 23);
             btnTrackCoords.TabIndex = 13;
@@ -173,7 +183,7 @@ namespace AutoAwaken
             // 
             // btnLockCoords
             // 
-            btnLockCoords.Location = new Point(202, 82);
+            btnLockCoords.Location = new Point(122, 21);
             btnLockCoords.Name = "btnLockCoords";
             btnLockCoords.Size = new Size(75, 23);
             btnLockCoords.TabIndex = 14;
@@ -200,7 +210,7 @@ namespace AutoAwaken
             // boxInt
             // 
             boxInt.AutoSize = true;
-            boxInt.Location = new Point(49, 222);
+            boxInt.Location = new Point(12, 35);
             boxInt.Name = "boxInt";
             boxInt.Size = new Size(68, 19);
             boxInt.TabIndex = 15;
@@ -210,7 +220,7 @@ namespace AutoAwaken
             // boxSta
             // 
             boxSta.AutoSize = true;
-            boxSta.Location = new Point(49, 241);
+            boxSta.Location = new Point(12, 54);
             boxSta.Name = "boxSta";
             boxSta.Size = new Size(69, 19);
             boxSta.TabIndex = 16;
@@ -220,7 +230,7 @@ namespace AutoAwaken
             // boxStr
             // 
             boxStr.AutoSize = true;
-            boxStr.Location = new Point(49, 260);
+            boxStr.Location = new Point(12, 73);
             boxStr.Name = "boxStr";
             boxStr.Size = new Size(69, 19);
             boxStr.TabIndex = 17;
@@ -230,7 +240,7 @@ namespace AutoAwaken
             // boxCrit
             // 
             boxCrit.AutoSize = true;
-            boxCrit.Location = new Point(135, 260);
+            boxCrit.Location = new Point(98, 73);
             boxCrit.Name = "boxCrit";
             boxCrit.Size = new Size(121, 19);
             boxCrit.TabIndex = 20;
@@ -240,7 +250,7 @@ namespace AutoAwaken
             // boxAspeed
             // 
             boxAspeed.AutoSize = true;
-            boxAspeed.Location = new Point(135, 241);
+            boxAspeed.Location = new Point(98, 54);
             boxAspeed.Name = "boxAspeed";
             boxAspeed.Size = new Size(128, 19);
             boxAspeed.TabIndex = 19;
@@ -250,7 +260,7 @@ namespace AutoAwaken
             // boxSpeed
             // 
             boxSpeed.AutoSize = true;
-            boxSpeed.Location = new Point(135, 222);
+            boxSpeed.Location = new Point(98, 35);
             boxSpeed.Name = "boxSpeed";
             boxSpeed.Size = new Size(91, 19);
             boxSpeed.TabIndex = 18;
@@ -260,7 +270,7 @@ namespace AutoAwaken
             // boxDex
             // 
             boxDex.AutoSize = true;
-            boxDex.Location = new Point(49, 279);
+            boxDex.Location = new Point(12, 92);
             boxDex.Name = "boxDex";
             boxDex.Size = new Size(70, 19);
             boxDex.TabIndex = 21;
@@ -270,7 +280,7 @@ namespace AutoAwaken
             // boxIcd
             // 
             boxIcd.AutoSize = true;
-            boxIcd.Location = new Point(135, 279);
+            boxIcd.Location = new Point(98, 92);
             boxIcd.Name = "boxIcd";
             boxIcd.Size = new Size(196, 19);
             boxIcd.TabIndex = 22;
@@ -280,7 +290,7 @@ namespace AutoAwaken
             // boxFp
             // 
             boxFp.AutoSize = true;
-            boxFp.Location = new Point(330, 260);
+            boxFp.Location = new Point(293, 73);
             boxFp.Name = "boxFp";
             boxFp.Size = new Size(96, 19);
             boxFp.TabIndex = 25;
@@ -290,7 +300,7 @@ namespace AutoAwaken
             // boxMp
             // 
             boxMp.AutoSize = true;
-            boxMp.Location = new Point(330, 241);
+            boxMp.Location = new Point(293, 54);
             boxMp.Name = "boxMp";
             boxMp.Size = new Size(101, 19);
             boxMp.TabIndex = 24;
@@ -300,7 +310,7 @@ namespace AutoAwaken
             // boxHp
             // 
             boxHp.AutoSize = true;
-            boxHp.Location = new Point(330, 222);
+            boxHp.Location = new Point(293, 35);
             boxHp.Name = "boxHp";
             boxHp.Size = new Size(99, 19);
             boxHp.TabIndex = 23;
@@ -310,7 +320,7 @@ namespace AutoAwaken
             // boxDct
             // 
             boxDct.AutoSize = true;
-            boxDct.Location = new Point(463, 260);
+            boxDct.Location = new Point(426, 73);
             boxDct.Name = "boxDct";
             boxDct.Size = new Size(186, 19);
             boxDct.TabIndex = 29;
@@ -320,7 +330,7 @@ namespace AutoAwaken
             // boxDef
             // 
             boxDef.AutoSize = true;
-            boxDef.Location = new Point(463, 241);
+            boxDef.Location = new Point(426, 54);
             boxDef.Name = "boxDef";
             boxDef.Size = new Size(75, 19);
             boxDef.TabIndex = 28;
@@ -330,7 +340,7 @@ namespace AutoAwaken
             // boxAttack
             // 
             boxAttack.AutoSize = true;
-            boxAttack.Location = new Point(463, 222);
+            boxAttack.Location = new Point(426, 35);
             boxAttack.Name = "boxAttack";
             boxAttack.Size = new Size(89, 19);
             boxAttack.TabIndex = 27;
@@ -342,7 +352,7 @@ namespace AutoAwaken
             toolStrip1.Items.AddRange(new ToolStripItem[] { toolStripComboBox1 });
             toolStrip1.Location = new Point(0, 0);
             toolStrip1.Name = "toolStrip1";
-            toolStrip1.Size = new Size(663, 25);
+            toolStrip1.Size = new Size(656, 25);
             toolStrip1.TabIndex = 30;
             toolStrip1.Text = "toolStrip1";
             // 
@@ -355,7 +365,7 @@ namespace AutoAwaken
             // 
             // numericUpDown1
             // 
-            numericUpDown1.Location = new Point(172, 146);
+            numericUpDown1.Location = new Point(103, 393);
             numericUpDown1.Name = "numericUpDown1";
             numericUpDown1.Size = new Size(57, 23);
             numericUpDown1.TabIndex = 31;
@@ -364,42 +374,15 @@ namespace AutoAwaken
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(90, 148);
+            label1.Location = new Point(21, 395);
             label1.Name = "label1";
             label1.Size = new Size(69, 15);
             label1.TabIndex = 32;
             label1.Text = "Stat Count: ";
             // 
-            // label2
-            // 
-            label2.AutoSize = true;
-            label2.Location = new Point(27, 85);
-            label2.Name = "label2";
-            label2.Size = new Size(90, 15);
-            label2.TabIndex = 33;
-            label2.Text = "Cursor Capture:";
-            // 
-            // label3
-            // 
-            label3.AutoSize = true;
-            label3.Location = new Point(19, 115);
-            label3.Name = "label3";
-            label3.Size = new Size(79, 15);
-            label3.TabIndex = 34;
-            label3.Text = "Area Capture:";
-            // 
-            // label4
-            // 
-            label4.AutoSize = true;
-            label4.Location = new Point(70, 48);
-            label4.Name = "label4";
-            label4.Size = new Size(70, 15);
-            label4.TabIndex = 35;
-            label4.Text = "Timer Click:";
-            // 
             // txtTime
             // 
-            txtTime.Location = new Point(145, 42);
+            txtTime.Location = new Point(19, 17);
             txtTime.Name = "txtTime";
             txtTime.Size = new Size(44, 23);
             txtTime.TabIndex = 36;
@@ -408,7 +391,7 @@ namespace AutoAwaken
             // label5
             // 
             label5.AutoSize = true;
-            label5.Location = new Point(195, 48);
+            label5.Location = new Point(69, 20);
             label5.Name = "label5";
             label5.Size = new Size(27, 15);
             label5.TabIndex = 37;
@@ -419,7 +402,7 @@ namespace AutoAwaken
             comboMode.DropDownStyle = ComboBoxStyle.DropDownList;
             comboMode.FormattingEnabled = true;
             comboMode.Items.AddRange(new object[] { "Strict", "Mix" });
-            comboMode.Location = new Point(172, 179);
+            comboMode.Location = new Point(103, 426);
             comboMode.Name = "comboMode";
             comboMode.Size = new Size(121, 23);
             comboMode.TabIndex = 38;
@@ -427,7 +410,7 @@ namespace AutoAwaken
             // label6
             // 
             label6.AutoSize = true;
-            label6.Location = new Point(114, 182);
+            label6.Location = new Point(45, 429);
             label6.Name = "label6";
             label6.Size = new Size(41, 15);
             label6.TabIndex = 39;
@@ -436,63 +419,150 @@ namespace AutoAwaken
             // checkBox1
             // 
             checkBox1.AutoSize = true;
-            checkBox1.Location = new Point(135, 300);
+            checkBox1.Location = new Point(98, 113);
             checkBox1.Name = "checkBox1";
             checkBox1.Size = new Size(196, 19);
             checkBox1.TabIndex = 40;
             checkBox1.Text = "Increased Critical Damage +17%";
             checkBox1.UseVisualStyleBackColor = true;
             // 
+            // chkPerin
+            // 
+            chkPerin.AutoSize = true;
+            chkPerin.Location = new Point(6, 22);
+            chkPerin.Name = "chkPerin";
+            chkPerin.Size = new Size(69, 19);
+            chkPerin.TabIndex = 41;
+            chkPerin.Text = "Activate";
+            chkPerin.UseVisualStyleBackColor = true;
+            // 
+            // txtPerin
+            // 
+            txtPerin.Location = new Point(96, 18);
+            txtPerin.Name = "txtPerin";
+            txtPerin.Size = new Size(43, 23);
+            txtPerin.TabIndex = 42;
+            txtPerin.Text = "62";
+            // 
+            // label7
+            // 
+            label7.AutoSize = true;
+            label7.Location = new Point(145, 21);
+            label7.Name = "label7";
+            label7.Size = new Size(27, 15);
+            label7.TabIndex = 43;
+            label7.Text = "sec.";
+            // 
+            // groupBox1
+            // 
+            groupBox1.Controls.Add(txtTime);
+            groupBox1.Controls.Add(label5);
+            groupBox1.Location = new Point(21, 28);
+            groupBox1.Name = "groupBox1";
+            groupBox1.Size = new Size(114, 46);
+            groupBox1.TabIndex = 44;
+            groupBox1.TabStop = false;
+            groupBox1.Text = "Click Timer";
+            // 
+            // groupBox2
+            // 
+            groupBox2.Controls.Add(label7);
+            groupBox2.Controls.Add(chkPerin);
+            groupBox2.Controls.Add(txtPerin);
+            groupBox2.Location = new Point(275, 28);
+            groupBox2.Name = "groupBox2";
+            groupBox2.Size = new Size(200, 52);
+            groupBox2.TabIndex = 45;
+            groupBox2.TabStop = false;
+            groupBox2.Text = "Auto Press Perin";
+            // 
+            // groupBox3
+            // 
+            groupBox3.Controls.Add(checkBox1);
+            groupBox3.Controls.Add(boxSpeed);
+            groupBox3.Controls.Add(boxInt);
+            groupBox3.Controls.Add(boxSta);
+            groupBox3.Controls.Add(boxStr);
+            groupBox3.Controls.Add(boxAspeed);
+            groupBox3.Controls.Add(boxCrit);
+            groupBox3.Controls.Add(boxDex);
+            groupBox3.Controls.Add(boxIcd);
+            groupBox3.Controls.Add(boxDct);
+            groupBox3.Controls.Add(boxHp);
+            groupBox3.Controls.Add(boxDef);
+            groupBox3.Controls.Add(boxMp);
+            groupBox3.Controls.Add(boxAttack);
+            groupBox3.Controls.Add(boxFp);
+            groupBox3.Location = new Point(21, 215);
+            groupBox3.Name = "groupBox3";
+            groupBox3.Size = new Size(616, 163);
+            groupBox3.TabIndex = 46;
+            groupBox3.TabStop = false;
+            groupBox3.Text = "Option";
+            // 
+            // groupBox4
+            // 
+            groupBox4.Controls.Add(txtAreaX);
+            groupBox4.Controls.Add(txtAreaY);
+            groupBox4.Controls.Add(txtAreaW);
+            groupBox4.Controls.Add(txtAreaH);
+            groupBox4.Controls.Add(btnSelectArea);
+            groupBox4.Location = new Point(21, 141);
+            groupBox4.Name = "groupBox4";
+            groupBox4.Size = new Size(616, 68);
+            groupBox4.TabIndex = 47;
+            groupBox4.TabStop = false;
+            groupBox4.Text = "Area Capture";
+            // 
+            // groupBox5
+            // 
+            groupBox5.Controls.Add(btnTrackCoords);
+            groupBox5.Controls.Add(txtX);
+            groupBox5.Controls.Add(txtY);
+            groupBox5.Controls.Add(btnLockCoords);
+            groupBox5.Location = new Point(21, 86);
+            groupBox5.Name = "groupBox5";
+            groupBox5.Size = new Size(454, 49);
+            groupBox5.TabIndex = 48;
+            groupBox5.TabStop = false;
+            groupBox5.Text = "Cursor Capture";
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(663, 780);
-            Controls.Add(checkBox1);
+            ClientSize = new Size(656, 780);
+            Controls.Add(groupBox5);
             Controls.Add(label6);
             Controls.Add(comboMode);
-            Controls.Add(label5);
-            Controls.Add(txtTime);
-            Controls.Add(label4);
-            Controls.Add(label3);
-            Controls.Add(label2);
             Controls.Add(label1);
             Controls.Add(numericUpDown1);
             Controls.Add(toolStrip1);
-            Controls.Add(boxDct);
-            Controls.Add(boxDef);
-            Controls.Add(boxAttack);
-            Controls.Add(boxFp);
-            Controls.Add(boxMp);
-            Controls.Add(boxHp);
-            Controls.Add(boxIcd);
-            Controls.Add(boxDex);
-            Controls.Add(boxCrit);
-            Controls.Add(boxAspeed);
-            Controls.Add(boxSpeed);
-            Controls.Add(boxStr);
-            Controls.Add(boxSta);
-            Controls.Add(boxInt);
-            Controls.Add(btnLockCoords);
-            Controls.Add(btnTrackCoords);
             Controls.Add(previewPanel);
-            Controls.Add(btnSelectArea);
             Controls.Add(btnStop);
             Controls.Add(btnStart);
             Controls.Add(comboKeywords);
             Controls.Add(txtLog);
-            Controls.Add(txtAreaH);
-            Controls.Add(txtAreaW);
-            Controls.Add(txtAreaY);
-            Controls.Add(txtAreaX);
-            Controls.Add(txtY);
-            Controls.Add(txtX);
+            Controls.Add(groupBox1);
+            Controls.Add(groupBox2);
+            Controls.Add(groupBox3);
+            Controls.Add(groupBox4);
             Name = "Form1";
-            Text = "AutoAwake V1.1 - YnaMocha";
+            Text = "AutoAwake V1.2 - YnaMocha";
             Load += Form1_Load;
             toolStrip1.ResumeLayout(false);
             toolStrip1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)numericUpDown1).EndInit();
+            groupBox1.ResumeLayout(false);
+            groupBox1.PerformLayout();
+            groupBox2.ResumeLayout(false);
+            groupBox2.PerformLayout();
+            groupBox3.ResumeLayout(false);
+            groupBox3.PerformLayout();
+            groupBox4.ResumeLayout(false);
+            groupBox4.PerformLayout();
+            groupBox5.ResumeLayout(false);
+            groupBox5.PerformLayout();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -534,13 +604,18 @@ namespace AutoAwaken
         private ToolStripComboBox toolStripComboBox1;
         private NumericUpDown numericUpDown1;
         private Label label1;
-        private Label label2;
-        private Label label3;
-        private Label label4;
         private TextBox txtTime;
         private Label label5;
         private ComboBox comboMode;
         private Label label6;
         private CheckBox checkBox1;
+        private CheckBox chkPerin;
+        private TextBox txtPerin;
+        private Label label7;
+        private GroupBox groupBox1;
+        private GroupBox groupBox2;
+        private GroupBox groupBox3;
+        private GroupBox groupBox4;
+        private GroupBox groupBox5;
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -7,6 +8,7 @@ using System.Windows.Forms;
 using Tesseract;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Button;
+using static AutoAwaken.Form1.NativeMethods;
 using Timer = System.Windows.Forms.Timer;
 
 namespace AutoAwaken
@@ -19,6 +21,7 @@ namespace AutoAwaken
         private bool isRunning = false;
         Timer clickTimer = new Timer();
         Timer cursorTimer = new Timer();
+        Timer keyPressTimer = new Timer();
         [DllImport("user32.dll")]
         static extern bool SetCursorPos(int X, int Y);
 
@@ -46,8 +49,51 @@ namespace AutoAwaken
         [DllImport("user32.dll")]
         static extern bool SetForegroundWindow(IntPtr hWnd);
 
-        [DllImport("user32.dll")]
-        static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
+
+
+
+        public static class NativeMethods
+        {
+            [StructLayout(LayoutKind.Sequential)]
+            public struct INPUT
+            {
+                public uint type;
+                public InputUnion U;
+            }
+
+            [StructLayout(LayoutKind.Explicit)]
+            public struct InputUnion
+            {
+                [FieldOffset(0)] public MOUSEINPUT mi;
+                [FieldOffset(0)] public KEYBDINPUT ki;
+            }
+
+            [StructLayout(LayoutKind.Sequential)]
+            public struct MOUSEINPUT
+            {
+                public int dx;
+                public int dy;
+                public int mouseData;
+                public int dwFlags;
+                public uint time;
+                public IntPtr dwExtraInfo;
+            }
+
+            [StructLayout(LayoutKind.Sequential)]
+            public struct KEYBDINPUT
+            {
+                public ushort wVk;
+                public ushort wScan;
+                public uint dwFlags;
+                public uint time;
+                public IntPtr dwExtraInfo;
+            }
+
+
+        }
+        [DllImport("user32.dll", SetLastError = true)]
+        public static extern uint SendInput(uint nInputs, INPUT[] pInputs, int cbSize);
+
 
         public Form1()
         {
@@ -59,11 +105,51 @@ namespace AutoAwaken
 
             clickTimer.Interval = 1000; // click every 500 ms clickTimer.Tick += ClickTimer_Tick;
             clickTimer.Tick += ClickTimer_Tick;
-            // 🔴 You forgot this part:
-            ocrTimer.Interval = 500; // 
+
+            ocrTimer.Interval = 500;
             ocrTimer.Tick += OcrTimer_Tick;
+
+            keyPressTimer.Tick += (s, e) => PressZero();
         }
-       
+
+
+        const int INPUT_KEYBOARD = 1;
+        const uint KEYEVENTF_KEYUP = 0x0002;
+        const ushort VK_0 = 0x30;
+
+        private void PressZero()
+        {
+            SendKeys.SendWait("0");
+            Console.WriteLine("SendKeys pressed 0");
+        }
+
+
+
+
+        private void chkPerin_CheckedChanged(object sender, EventArgs e)
+        {
+            if (chkPerin.Checked)
+            {
+                if (int.TryParse(txtPerin.Text, out int seconds) && seconds > 0)
+                {
+                    keyPressTimer.Interval = seconds * 1000; // convert seconds to ms
+                    keyPressTimer.Start();
+                    Console.WriteLine($"Auto press 0 started, every {seconds} seconds.");
+                }
+                else
+                {
+                    MessageBox.Show("Enter a valid number of seconds.");
+                    chkPerin.Checked = false;
+                }
+            }
+            else
+            {
+                keyPressTimer.Stop();
+                Console.WriteLine("Auto press 0 stopped.");
+            }
+        }
+
+
 
         private void CursorTimer_Tick(object sender, EventArgs e)
         {
@@ -74,19 +160,6 @@ namespace AutoAwaken
                 txtY.Text = p.Y.ToString();
             }
         }
-
-
-
-        private void FocusTargetWindow()
-        {
-            // Replace with the exact title of the external app window
-            IntPtr hWnd = FindWindow(null, "Notepad");
-            if (hWnd != IntPtr.Zero)
-            {
-                SetForegroundWindow(hWnd);
-            }
-        }
-
 
 
         private void btnStart_Click(object sender, EventArgs e)
@@ -127,14 +200,7 @@ namespace AutoAwaken
                 timer.Start();
             }
         }
-        private void ToggleClicking()
-        {
-            if (!clickTimer.Enabled)
-                clickTimer.Start();
-            else
-                clickTimer.Stop();
-        }
-
+       
         private void ToggleStartStop()
         {
             if (!isRunning)
@@ -157,10 +223,17 @@ namespace AutoAwaken
 
                 // Set intervals
                 clickTimer.Interval = (int)(double.Parse(txtTime.Text) * 1000);
-              
-                ocrTimer.Interval = 100;  // OCR every 1 second
+                ocrTimer.Interval = 100;  // OCR every 0.1 second
 
-                // Start both timers
+                // 🔹 If chkPerin is checked, start keyPressTimer with txtPerin interval
+                if (chkPerin.Checked && int.TryParse(txtPerin.Text, out int seconds) && seconds > 0)
+                {
+                    keyPressTimer.Interval = seconds * 1000;
+                    keyPressTimer.Start();
+                    Console.WriteLine($"Auto press 0 started, every {seconds} seconds.");
+                }
+
+                // Start other timers
                 clickTimer.Start();
                 ocrTimer.Start();
                 isRunning = true;
@@ -172,12 +245,14 @@ namespace AutoAwaken
             {
                 clickTimer.Stop();
                 ocrTimer.Stop();
+                keyPressTimer.Stop();   // 🔹 stop auto press too
                 isRunning = false;
 
                 btnStart.Text = "Start";
                 btnStart.BackColor = SystemColors.Control;
             }
         }
+
 
 
 
@@ -198,13 +273,23 @@ namespace AutoAwaken
             base.WndProc(ref m);
         }
 
-        
-
         private void Form1_Load(object sender, EventArgs e)
         {
             comboMode.SelectedIndex = 0;
             RegisterHotKey(this.Handle, HOTKEY_CURSOR, 0, VK_F4);
             RegisterHotKey(this.Handle, HOTKEY_STARTSTOP, 0, VK_F5);
+
+    
+
+            // 🔹 List all window titles
+            foreach (Process p in Process.GetProcesses())
+            {
+                if (!string.IsNullOrEmpty(p.MainWindowTitle))
+                {
+                    Console.WriteLine(p.MainWindowTitle);
+                }
+            }
+
         }
 
         private void btnStop_Click(object sender, EventArgs e)
@@ -220,7 +305,6 @@ namespace AutoAwaken
                 .Select(cb => cb.Text)
                 .ToList();
         }
-
 
         private void OcrTimer_Tick(object sender, EventArgs e)
         {
@@ -281,10 +365,6 @@ namespace AutoAwaken
             MessageBox.Show(message);
         }
 
-
-
-
-
         private Bitmap PreprocessForOcr(Rectangle area)
         {
             // Capture the screen area
@@ -310,8 +390,6 @@ namespace AutoAwaken
             return scaled;
         }
 
-
-
         private Bitmap CaptureScreenArea(Rectangle area)
         {
             Bitmap bmp = new Bitmap(area.Width, area.Height);
@@ -334,36 +412,13 @@ namespace AutoAwaken
             }
         }
 
-        [StructLayout(LayoutKind.Sequential)]
-        struct INPUT
-        {
-            public int type;
-            public MOUSEINPUT mi;
-        }
-
-        [StructLayout(LayoutKind.Sequential)]
-        struct MOUSEINPUT
-        {
-            public int dx;
-            public int dy;
-            public int mouseData;
-            public int dwFlags;
-            public int time;
-            public IntPtr dwExtraInfo;
-        }
-
-        [DllImport("user32.dll", SetLastError = true)]
-        static extern uint SendInput(uint nInputs, INPUT[] pInputs, int cbSize);
-
-        const int INPUT_MOUSE = 0;
-
 
         private void ClickTimer_Tick(object sender, EventArgs e)
         {
             PerformClick();
         }
 
- 
+
 
         private void PerformClick()
         {
@@ -377,7 +432,7 @@ namespace AutoAwaken
             // Simulate left mouse click
             mouse_event(MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP, clickX, clickY, 0, 0);
 
-        
+
         }
 
 
@@ -443,4 +498,6 @@ namespace AutoAwaken
             cursorTimer.Stop();
         }
     }
+
 }
+
