@@ -1,4 +1,5 @@
-﻿using System.Media;
+﻿using System.Diagnostics;
+using System.Media;
 using Timer = System.Windows.Forms.Timer;
 
 namespace AutoAwaken
@@ -11,13 +12,18 @@ namespace AutoAwaken
         const int VK_F4 = 0x73;
         const int VK_F5 = 0x74;
 
-        // After this many OCR reads with no new text, we assume the game is stuck
-        // and click the Perin button.
-        const int STUCK_LIMIT = 10;
+        // If the captured text stays the same (or empty) this long, we assume the game is stuck
+        // and click the Perin position a few times to get it going again.
+        static readonly TimeSpan STUCK_TIME = TimeSpan.FromSeconds(10);
+        const int STUCK_CLICK_COUNT = 10;
+        const int STUCK_CLICK_DELAY_MS = 50;
+
+        // The log is cleared when it gets longer than this, so adding to it stays fast
+        const int MAX_LOG_LENGTH = 50_000;
 
         private readonly Timer cursorTimer = new Timer { Interval = 1000 }; // shows the mouse position
         private readonly Timer clickTimer = new Timer();                    // clicks the awaken button
-        private readonly Timer ocrTimer = new Timer { Interval = 200 };     // reads the stats from the screen
+        private readonly Timer ocrTimer = new Timer { Interval = 50 };      // reads the stats from the screen (a new read starts as soon as the last one ends)
         private readonly Timer perinKeyTimer = new Timer();                 // presses the "0" key
 
         private ScreenReader? screenReader;
@@ -26,7 +32,7 @@ namespace AutoAwaken
         private bool isReading = false;
 
         private string lastText = "";
-        private int sameTextCount = 0;
+        private readonly Stopwatch sameTextTime = new Stopwatch(); // how long the text has not changed
 
         public MainForm()
         {
@@ -175,6 +181,9 @@ namespace AutoAwaken
                 Console.WriteLine($"Auto press 0 started, every {perinSeconds} seconds.");
             }
 
+            lastText = "";
+            sameTextTime.Restart();
+
             clickTimer.Start();
             ocrTimer.Start();
             isRunning = true;
@@ -223,26 +232,38 @@ namespace AutoAwaken
 
         private void PressZeroKey()
         {
-            SendKeys.SendWait("0");
-            Console.WriteLine("SendKeys pressed 0");
+            Win32.PressKey(Win32.VK_0);
+            Console.WriteLine("Pressed 0");
         }
 
-        /// <summary>Clicks the Perin position 5 times. Used when the screen seems stuck.</summary>
-        private void ClickPerin()
+        /// <summary>Clicks the Perin position several times, with a short pause so the game sees every click. Used when the screen seems stuck.</summary>
+        private async Task ClickPerinWhenStuck()
         {
-            if (!int.TryParse(txtPerinX.Text, out int x)) return;
-            if (!int.TryParse(txtPerinY.Text, out int y)) return;
-
-            Thread.Sleep(100);
-            for (int i = 0; i < 5; i++)
+            if (!int.TryParse(txtPerinX.Text, out int x) || !int.TryParse(txtPerinY.Text, out int y))
             {
-                Win32.ClickAt(x, y);
+                Console.WriteLine("[ERROR] Invalid Perin X/Y, cannot click Perin");
+                return;
             }
 
-            sameTextCount = 0;
+            Console.WriteLine($"[DEBUG] Text unchanged for {STUCK_TIME.TotalSeconds}s → clicking Perin ({x}, {y}) x{STUCK_CLICK_COUNT}");
+            // Pause the awaken clicks so they don't move the mouse away in between
+            clickTimer.Stop();
+            try
+            {
+                for (int i = 0; i < STUCK_CLICK_COUNT; i++)
+                {
+                    if (!isRunning) return;
+                    Win32.ClickAt(x, y);
+                    await Task.Delay(STUCK_CLICK_DELAY_MS);
+                }
+            }
+            finally
+            {
+                if (isRunning) clickTimer.Start();
+            }
         }
 
-        private void ReadAndCheckStats()
+        private async void ReadAndCheckStats()
         {
             // Skip this tick if the previous read is still running
             if (isReading) return;
@@ -250,19 +271,29 @@ namespace AutoAwaken
 
             try
             {
-                string text = screenReader!.ReadText(captureArea);
+                // Run the OCR on a background thread so the window (and the log) never freezes
+                ScreenReader reader = screenReader!;
+                Rectangle area = captureArea;
+                string text = await Task.Run(() => reader.ReadText(area));
+
+                // Stopped while the OCR was running: ignore this result
+                if (!isRunning) return;
+
                 Console.WriteLine($"[DEBUG] OCR normalizedText: '{text}'");
 
-                // Watch for a stuck screen: the same text (or no text) over and over
-                if (text == lastText) sameTextCount++;
-                else sameTextCount = 0;
-                if (string.IsNullOrWhiteSpace(text)) sameTextCount++;
+                // Watch for a stuck screen: the same text (or no text) for too long
+                bool isNewText = text != lastText;
+                if (isNewText && !string.IsNullOrWhiteSpace(text)) sameTextTime.Restart();
                 lastText = text;
 
-                if (sameTextCount >= STUCK_LIMIT)
+                if (sameTextTime.Elapsed >= STUCK_TIME)
                 {
-                    ClickPerin();
+                    await ClickPerinWhenStuck();
+                    sameTextTime.Restart();
                 }
+
+                // Same roll as last time: already logged and checked
+                if (!isNewText) return;
 
                 // Fewer than 3 lines means the stats window is not fully read yet
                 string[] lines = text.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);
@@ -272,7 +303,7 @@ namespace AutoAwaken
                     return;
                 }
 
-                AddToLog(text);
+                int logStart = AddToLog(text);
 
                 List<string> wantedStats = GetCheckedStats();
                 string? mode = comboMode.SelectedItem?.ToString();
@@ -285,8 +316,9 @@ namespace AutoAwaken
                 CheckResult result = StatChecker.Check(text, wantedStats, mode, statCount, chkSemiPerf.Checked);
                 if (result.IsGoodRoll)
                 {
+                    // Highlight first, so the stats are visible while the alarm box is open
+                    HighlightInLog(result.MatchedStats, logStart);
                     StopWithAlarm(result.Message);
-                    HighlightInLog(result.MatchedStats);
                 }
             }
             catch (Exception ex)
@@ -309,21 +341,29 @@ namespace AutoAwaken
                 .ToList();
         }
 
-        private void AddToLog(string text)
+        /// <summary>Adds text to the log and returns where it starts. Old lines are trimmed so the log stays fast.</summary>
+        private int AddToLog(string text)
         {
+            if (txtLog.TextLength > MAX_LOG_LENGTH)
+            {
+                txtLog.Clear();
+            }
+
+            int start = txtLog.TextLength;
             txtLog.AppendText(text + Environment.NewLine);
-            txtLog.SelectionStart = txtLog.Text.Length;
+            txtLog.SelectionStart = txtLog.TextLength;
             txtLog.ScrollToCaret();
+            return start;
         }
 
-        /// <summary>Marks every occurrence of the given stats in the log (bold, black on white).</summary>
-        private void HighlightInLog(List<string> stats)
+        /// <summary>Marks every occurrence of the given stats in the log from <paramref name="startIndex"/> on (bold, black on white).</summary>
+        private void HighlightInLog(List<string> stats, int startIndex)
         {
             foreach (string stat in stats)
             {
                 string cleanStat = System.Text.RegularExpressions.Regex.Replace(stat, @"\s+", " ").Trim();
 
-                int index = 0;
+                int index = startIndex;
                 while ((index = txtLog.Find(cleanStat, index, RichTextBoxFinds.None)) != -1)
                 {
                     txtLog.SelectionStart = index;
