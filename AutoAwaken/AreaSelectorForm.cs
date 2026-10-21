@@ -1,74 +1,69 @@
-﻿using System;
-using System.Drawing;
-using System.Windows.Forms;
-
-namespace AutoAwaken
+﻿namespace AutoAwaken
 {
+    /// <summary>
+    /// A dark see-through window over the whole screen. Drag with the left mouse
+    /// button to pick an area; the window closes when you let go.
+    /// </summary>
     public partial class AreaSelectorForm : Form
     {
-        private Point startPoint;
-        private Rectangle selectedArea;
+        private Point dragStart;
         private bool isDragging = false;
 
-        public Rectangle SelectedArea => selectedArea;
+        public Rectangle SelectedArea { get; private set; }
 
         public AreaSelectorForm()
         {
             InitializeComponent();
-            this.FormBorderStyle = FormBorderStyle.None;
-            this.WindowState = FormWindowState.Maximized;
-            this.Opacity = 0.3; // semi-transparent overlay
-            this.BackColor = Color.Black;
-            this.TopMost = true;
-            this.DoubleBuffered = true;
+            FormBorderStyle = FormBorderStyle.None;
+            WindowState = FormWindowState.Maximized;
+            Opacity = 0.3;
+            BackColor = Color.Black;
+            TopMost = true;
+            DoubleBuffered = true;
         }
 
         protected override void OnMouseDown(MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left)
             {
-                startPoint = e.Location;
+                dragStart = e.Location;
                 isDragging = true;
             }
         }
-        private void AreaSelectorForm_Load(object sender, EventArgs e)
-        {
 
-        }
         protected override void OnMouseMove(MouseEventArgs e)
         {
-            if (isDragging)
-            {
-                var endPoint = e.Location;
-                selectedArea = new Rectangle(
-                    Math.Min(startPoint.X, endPoint.X),
-                    Math.Min(startPoint.Y, endPoint.Y),
-                    Math.Abs(startPoint.X - endPoint.X),
-                    Math.Abs(startPoint.Y - endPoint.Y)
-                );
-                Invalidate(); // redraw rectangle
-            }
+            if (!isDragging) return;
+
+            SelectedArea = new Rectangle(
+                Math.Min(dragStart.X, e.X),
+                Math.Min(dragStart.Y, e.Y),
+                Math.Abs(dragStart.X - e.X),
+                Math.Abs(dragStart.Y - e.Y));
+            Invalidate();
         }
 
         protected override void OnMouseUp(MouseEventArgs e)
         {
-            if (isDragging)
-            {
-                isDragging = false;
-                DialogResult = DialogResult.OK;
-                Close();
-            }
+            if (!isDragging) return;
+
+            isDragging = false;
+            DialogResult = DialogResult.OK;
+            Close();
         }
 
         protected override void OnPaint(PaintEventArgs e)
         {
-            if (selectedArea != Rectangle.Empty)
+            if (SelectedArea != Rectangle.Empty)
             {
-                using (Pen pen = new Pen(Color.Red, 2))
-                {
-                    e.Graphics.DrawRectangle(pen, selectedArea);
-                }
+                using var pen = new Pen(Color.Red, 2);
+                e.Graphics.DrawRectangle(pen, SelectedArea);
             }
+        }
+
+        private void AreaSelectorForm_Load(object sender, EventArgs e)
+        {
+
         }
     }
 }

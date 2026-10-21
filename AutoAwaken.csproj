@@ -1,0 +1,5 @@
+<ItemGroup>
+  <Content Include="alarm.wav">
+    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+  </Content>
+</ItemGroup>

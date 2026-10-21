@@ -3,11 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.13.35825.156
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoAwaken", "AutoAwaken\AutoAwaken.csproj", "{1FE3CF6F-E7B8-49B8-B5D9-38BCF0DE744D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chrome", "AutoAwaken\Chrome.csproj", "{1FE3CF6F-E7B8-49B8-B5D9-38BCF0DE744D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8EC462FD-D22E-90A8-E5CE-7E832BA40C5D}"
 	ProjectSection(SolutionItems) = preProject
+		alarm.wav = alarm.wav
 		app.manifest = app.manifest
+		Icon1.ico = Icon1.ico
 	EndProjectSection
 EndProject
 Global

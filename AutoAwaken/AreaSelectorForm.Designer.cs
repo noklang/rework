@@ -42,7 +42,7 @@ namespace AutoAwaken
             ResumeLayout(false);
         }
 
-        
+
 
         #endregion
     }
